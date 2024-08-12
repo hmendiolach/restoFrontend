@@ -9,5 +9,5 @@ export const getQRMenuLink = (code) => {
 
 export const iconStroke = 1.5;
 
-export const subscriptionPrice = "$5";
+export const subscriptionPrice = "$0";
 export const stripeProductSubscriptionId = "price_1POsjYSCWiCS3BoQN2lnBMTz";
