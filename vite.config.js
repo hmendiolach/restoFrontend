@@ -9,8 +9,8 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       manifest: {
-        name: "RestroPro",
-        short_name: "RestroPro",
+        name: "Tablez POS",
+        short_name: "Tablez",
         description: "Manage Your Restaurant, Cafe, Hotel, Bar, Food Truck, Stall, any food store.",
         theme_color: "#ECF1EB",
         icons: [
