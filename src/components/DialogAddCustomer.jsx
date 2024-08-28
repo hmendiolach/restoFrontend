@@ -5,8 +5,8 @@ import { mutate } from "swr";
 import { validateEmail } from "../utils/emailValidator";
 import { validatePhone } from "../utils/phoneValidator";
 
-export default function DialogAddCustomer({APIURL}) {
-  const phoneRef = useRef();
+export default function DialogAddCustomer({APIURL , onSuccess , phone = ""}) {
+  const phoneRef = useRef(phone);
   const nameRef = useRef();
   const emailRef = useRef();
   const genderRef = useRef();
@@ -50,10 +50,13 @@ export default function DialogAddCustomer({APIURL}) {
         emailRef.current.value = null;
         genderRef.current.value = null;
         birthDateRef.current.value = null;
-        
+
+        onSuccess(phone, name, email, birthDate, gender);
+
         await mutate(APIURL);
         toast.dismiss();
         toast.success(res.data.message);
+        document.getElementById('modal-add-customer').close();
       }
     } catch (error) {
       const message = error?.response?.data?.message || "Something went wrong!";
@@ -80,6 +83,7 @@ export default function DialogAddCustomer({APIURL}) {
             ref={phoneRef}
             type="tel"
             name="phone"
+            defaultValue={phone}
             className="text-sm w-full border rounded-lg px-4 py-2 bg-gray-50 outline-restro-border-green-light"
             placeholder="Enter Customer's Phone No."
           />
@@ -145,13 +149,18 @@ export default function DialogAddCustomer({APIURL}) {
           </div>
         </div>
 
+
         <div className="modal-action">
+
           <form method="dialog">
             {/* if there is a button in form, it will close the modal */}
             <button className="rounded-lg hover:bg-gray-200 transition active:scale-95 hover:shadow-lg px-4 py-3 bg-gray-200 text-gray-500">
               Close
             </button>
-            <button
+
+          </form>
+
+          <button
               onClick={() => {
                 btnAdd();
               }}
@@ -159,7 +168,7 @@ export default function DialogAddCustomer({APIURL}) {
             >
               Save
             </button>
-          </form>
+
         </div>
       </div>
     </dialog>

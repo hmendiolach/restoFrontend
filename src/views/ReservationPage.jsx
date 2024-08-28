@@ -23,6 +23,7 @@ import {
 import ReservationCard from "../components/ReservationCard";
 import { SCOPES } from "../config/scopes";
 import { getUserDetailsInLocalStorage } from "../helpers/UserDetails";
+import DialogAddCustomer from "../components/DialogAddCustomer";
 
 export default function ReservationPage() {
 
@@ -82,6 +83,7 @@ export default function ReservationPage() {
     fromDate: null,
     toDate: null,
     customer: null,
+    tempCustomerPhone:null,
   });
 
   const {
@@ -135,12 +137,12 @@ export default function ReservationPage() {
           search: searchQuery,
           searchResults: res.data,
           spage: 1,
-        }); 
+        });
       } else {
         toast.dismiss();
         toast.error("No result found!");
       }
-      
+
     } catch (error) {
       console.error(error);
       const message = error.response.data.message || "Something went wrong! Try later!";
@@ -183,11 +185,27 @@ export default function ReservationPage() {
       } else {
         toast.dismiss();
         toast.error(res.data.message);
+        setState({
+          ...state,
+          tempCustomerPhone : customerSearch
+        })
+        document.getElementById("modal-add-customer").showModal();
+
       }
     } catch (error) {
       const message = error?.response?.data?.message || "Something went wrong!";
       toast.dismiss();
       toast.error(message);
+
+      // If the error status is 404, open the modal to add a new customer
+      if (error?.response?.status === 404) {
+        setState({
+          ...state,
+          tempCustomerPhone : customerSearch
+        })
+
+        document.getElementById("modal-add-customer").showModal();
+      }
     }
   };
 
@@ -408,7 +426,7 @@ export default function ReservationPage() {
 
             const createdAt = new Date(created_at).toLocaleString("EN", {dateStyle: "medium", timeStyle: "short"});
 
-            return <ReservationCard 
+            return <ReservationCard
               btnDelete={()=>{
                 btnDelete(id)
               }}
@@ -472,7 +490,7 @@ export default function ReservationPage() {
 
             const createdAt = new Date(created_at).toLocaleString("EN", {dateStyle: "medium", timeStyle: "short"});
 
-            return <ReservationCard 
+            return <ReservationCard
               btnDelete={()=>{
                 btnDelete(id)
               }}
@@ -845,6 +863,19 @@ export default function ReservationPage() {
         </div>
       </dialog>
       {/* update dialog */}
+
+      {/* add dialog */}
+      <DialogAddCustomer APIURL={null} onSuccess={(phone, name, email, birth_date, gender) => {
+        setState({
+          ...state,
+          customer:{
+            phone, name , email , birth_date , gender
+          },
+        });
+
+        customerSearchRef.current.value = phone;
+      }} phone={state.tempCustomerPhone}/>
+      {/* add dialog */}
     </Page>
   );
 }
