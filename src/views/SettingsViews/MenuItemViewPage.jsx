@@ -358,6 +358,7 @@ export default function MenuItemViewPage() {
         // update the image state
         const imagePath = res.data.imageURL;
         await mutate(APIURL);
+        location.reload();
       }
 
     } catch (error) {
@@ -383,6 +384,7 @@ export default function MenuItemViewPage() {
         toast.dismiss();
         toast.success(res.data.message);
         await mutate(APIURL);
+        location.reload();
       }
 
     } catch (error) {
