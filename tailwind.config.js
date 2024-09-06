@@ -10,7 +10,10 @@ export default {
         'restro-green-light': "#ECF1EB",
         'restro-green': "#70B56A",
         'restro-green-dark': "#243922",
-        'restro-border-green-light': "#DCE7DB"
+        'restro-border-green-light': "#DCE7DB",
+        'restro-superadmin-widget-bg': "#BEDC74",
+        'restro-superadmin-text-green': "#387F39",
+        'restro-superadmin-text-black': "#444444"
       }
     },
   },
@@ -20,4 +23,3 @@ export default {
     darkTheme: "light",
   }
 }
-

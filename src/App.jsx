@@ -41,6 +41,14 @@ import PaymentSuccessPage from "./views/PaymentSuccessPage";
 import PaymentCancelledPage from "./views/PaymentCancelledPage";
 import ResetPasswordPage from "./views/ResetPasswordPage";
 import QRMenuPage from "./views/QRMenuPage";
+import SuperAdminProtectedRoute from "./helpers/SuperAdminProtectedRoute";
+import SuperAdminLoginPage from "./views/SuperAdmin/LoginPage";
+import SuperAdminDashboadLayout from "./views/SuperAdmin/SuperAdminDashboadLayout";
+import SuperAdminDashboardPage from "./views/SuperAdmin/SuperAdminDashboardPage";
+import SuperAdminContactSupportPage from "./views/SuperAdmin/SuperAdminContactSupportPage";
+import SuperAdminTenantsPage from "./views/SuperAdmin/SuperAdminTenantsPage";
+import SuperAdminReportsPage from "./views/SuperAdmin/SuperAdminReportsPage";
+import SuperAdminTenantSubscriptionHistoryPage from "./views/SuperAdmin/SuperAdminTenantSubscriptionHistoryPage";
 
 export default function App() {
   const [isNavbarCollapsed, setIsNavbarCollapsed] = useState(
@@ -60,14 +68,15 @@ export default function App() {
           <Route path="/print-receipt" element={<PrintReceiptPage />} />
           <Route path="/print-token" element={<PrintTokenPage />} />
           <Route path="/no-access" element={<NoAccessPage />} />
-          
+
           <Route path="/success" element={<PaymentSuccessPage />} />
           <Route path="/cancelled-payment" element={<PaymentCancelledPage />} />
 
           <Route path="/dashboard/inactive-subscription" element={<InActiveSubscriptionPage />} />
-          
+
           <Route path="/m/:qrcode" element={<QRMenuPage />} />
 
+          {/* app routes */}
           <Route
             path="/dashboard"
             element={
@@ -172,7 +181,7 @@ export default function App() {
                 </ScopeProtectedRoute>
               }
             />
-            
+
             <Route path="devices" element={<DevicesPage />} />
             <Route path="contact-support" element={<ContactSupport />} />
 
@@ -196,9 +205,26 @@ export default function App() {
               />
               <Route path="tax-setup" element={<TaxSetupPage />} />
               <Route path="payment-types" element={<PaymentTypesPage />} />
-              
+
             </Route>
           </Route>
+          {/* app routes */}
+
+
+          {/* superadmin routes */}
+          <Route path="/superadmin" element={<SuperAdminLoginPage />} />
+          <Route path="/superadmin/login" element={<SuperAdminLoginPage />} />
+          <Route path="/superadmin/dashboard" element={<PrivateRoute><SuperAdminDashboadLayout/></PrivateRoute>}>
+            <Route path="" element={<SuperAdminProtectedRoute><SuperAdminDashboardPage /></SuperAdminProtectedRoute>} />
+            <Route path="home" element={<SuperAdminProtectedRoute><SuperAdminDashboardPage /></SuperAdminProtectedRoute>} />
+            <Route path="tenants" element={<SuperAdminProtectedRoute><SuperAdminTenantsPage /></SuperAdminProtectedRoute>} />
+            <Route path="tenants/:id/subscription-history" element={<SuperAdminProtectedRoute><SuperAdminTenantSubscriptionHistoryPage /></SuperAdminProtectedRoute>} />
+            <Route path="reports" element={<SuperAdminProtectedRoute><SuperAdminReportsPage /></SuperAdminProtectedRoute>} />
+            <Route path="contact-support" element={<SuperAdminProtectedRoute><SuperAdminContactSupportPage /></SuperAdminProtectedRoute>} />
+          </Route>
+          {/* superadmin routes */}
+
+
         </Routes>
         <Toaster />
       </BrowserRouter>

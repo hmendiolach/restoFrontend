@@ -1,6 +1,7 @@
 import axios from "axios";
 import { API } from "../config/config";
 import Cookie from "js-cookie";
+import { getUserDetailsInLocalStorage } from "./UserDetails";
 
 const apiClient = axios.create({
   baseURL: API,
@@ -21,6 +22,9 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    const user = getUserDetailsInLocalStorage();
+    const role = user?.role || "";
+
     if(error.response.status === 402) { // payment required, subscription is not active
       window.location.href = "/dashboard/inactive-subscription"
       return;
@@ -33,16 +37,24 @@ apiClient.interceptors.response.use(
 
       if(retryCounter > 3) {
         Cookie.remove("restroprosaas__authenticated");
-        window.location.href = "/login";
+        if(role == "superadmin") {
+          window.location.href = "/superadmin";
+        } else {
+          window.location.href = "/login";
+        }
         return;
       }
 
       try {
-        const res = await apiClient.post("/auth/refresh-token");
+        const res = role == "superadmin"? await apiClient.post("/superadmin/refresh-token") : await apiClient.post("/auth/refresh-token");
         const data = res.data;
 
         if(res.status == 401 || res.status == 403) {
-          window.location.href = "/login";
+          if(role == "superadmin") {
+            window.location.href = "/superadmin";
+          } else {
+            window.location.href = "/login";
+          }
           return;
         }
         retryCounter = 0;
@@ -50,7 +62,11 @@ apiClient.interceptors.response.use(
       } catch (error) {
         // Handle refresh token error (e.g., redirect to login)
         console.error(error);
-        window.location.href = "/login";
+        if(role == "superadmin") {
+          window.location.href = "/superadmin";
+        } else {
+          window.location.href = "/login";
+        }
         return Promise.reject(error);
       }
     } else {

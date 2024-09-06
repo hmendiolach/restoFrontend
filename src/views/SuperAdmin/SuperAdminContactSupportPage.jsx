@@ -1,11 +1,12 @@
 import React from 'react'
 import Page from "../../components/Page";
 import { IconBrandGmail, IconCopy, IconExternalLink, IconMail, IconX } from "@tabler/icons-react";
-import { iconStroke } from "../../config/config";
+import { iconStroke, supportEmail } from "../../config/config";
 import toast from 'react-hot-toast';
 
-export default function ContactSupportPage() {
-  const email = "";
+
+export default function SuperAdminContactSupportPage() {
+  const email = supportEmail;
 
   return (
     <Page>
@@ -31,9 +32,9 @@ export default function ContactSupportPage() {
             <form method="dialog">
               {/* if there is a button in form, it will close the modal */}
               <button className="btn btn-circle btn-ghost"><IconX stroke={iconStroke} /></button>
-            </form>
+            </form>  
           </div>
-
+          
           <div className="flex gap-2 mt-4">
             <input type="email" id='mailto_email' disabled value={email} className='input input-bordered input-disabled flex-1' />
             <button onClick={()=>{

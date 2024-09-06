@@ -331,7 +331,7 @@ export default function MenuItemViewPage() {
   }
 
   const handleFileChange = async (e) => {
-    
+
     const file = e.target.files[0];
 
     if(!file) {
@@ -378,7 +378,7 @@ export default function MenuItemViewPage() {
 
     try {
       toast.loading("Please wait...");
-      
+
       const res = await removeMenuItemPhoto(itemId);
       if(res.status == 200) {
         toast.dismiss();
@@ -415,11 +415,11 @@ export default function MenuItemViewPage() {
 
             {
               image ? <div className="w-full h-full relative top-0 left-0">
-                <img src={imageURL} alt={title} className="w-full h-full absolute top-0 left-0 rounded-2xl object-cover" /> 
+                <img src={imageURL} alt={title} className="w-full h-full absolute top-0 left-0 rounded-2xl object-cover" />
               </div>:
               <p className="absolute"><IconCarrot stroke={iconStroke} /></p>
             }
-            
+
 
             {/* upload image options */}
             <div className="absolute bottom-2 md:bottom-auto md:top-4 md:right-4 flex items-center gap-2">
@@ -549,11 +549,11 @@ export default function MenuItemViewPage() {
 
           {/* variants */}
           <div className="collapse bg-gray-50 collapse-arrow mt-6">
-            <input type="checkbox" /> 
+            <input type="checkbox" />
             <div className="collapse-title font-medium">
               Show Variants
             </div>
-            <div className="collapse-content flex flex-col"> 
+            <div className="collapse-content flex flex-col">
               {
                 variants.map((variant, index)=>{
                   return <div key={variant.id} className="flex items-center justify-between hover:bg-gray-100 transition p-2 rounded-lg cursor-pointer">
@@ -590,11 +590,11 @@ export default function MenuItemViewPage() {
 
           {/* addons */}
           <div className="collapse bg-gray-50 collapse-arrow mt-4">
-            <input type="checkbox" /> 
+            <input type="checkbox" />
             <div className="collapse-title font-medium">
               Show Addons
             </div>
-            <div className="collapse-content flex flex-col"> 
+            <div className="collapse-content flex flex-col">
               {
                 addons.map((addon, index)=>{
                   return <div key={addon.id} className="flex items-center justify-between hover:bg-gray-100 transition p-2 rounded-lg cursor-pointer">
@@ -635,7 +635,7 @@ export default function MenuItemViewPage() {
       <dialog id="modal-add-variant" className="modal modal-bottom sm:modal-middle">
         <div className="modal-box">
           <h3 className="font-bold text-lg">Add New Variant</h3>
-          
+
           <div className="mt-4">
             <label htmlFor="title" className="mb-1 block text-gray-500 text-sm">Variant Title</label>
             <input ref={variantTitleRef} type="text" name="title" className="text-sm w-full border rounded-lg px-4 py-2 bg-gray-50 outline-restro-border-green-light" placeholder="Enter Variant Title" />
@@ -663,7 +663,7 @@ export default function MenuItemViewPage() {
       <dialog id="modal-update-variant" className="modal modal-bottom sm:modal-middle">
         <div className="modal-box">
           <h3 className="font-bold text-lg">Update Variant</h3>
-          
+
           <div className="mt-4">
             <input type="hidden" ref={variantIdRef} />
             <label htmlFor="title" className="mb-1 block text-gray-500 text-sm">Variant Title</label>
@@ -692,7 +692,7 @@ export default function MenuItemViewPage() {
       <dialog id="modal-add-addon" className="modal modal-bottom sm:modal-middle">
         <div className="modal-box">
           <h3 className="font-bold text-lg">Add New Addon</h3>
-          
+
           <div className="mt-4">
             <label htmlFor="title" className="mb-1 block text-gray-500 text-sm">Addon Title</label>
             <input ref={addonTitleRef} type="text" name="title" className="text-sm w-full border rounded-lg px-4 py-2 bg-gray-50 outline-restro-border-green-light" placeholder="Enter Addon Title" />
@@ -720,7 +720,7 @@ export default function MenuItemViewPage() {
       <dialog id="modal-update-addon" className="modal modal-bottom sm:modal-middle">
         <div className="modal-box">
           <h3 className="font-bold text-lg">Update Addon</h3>
-          
+
           <div className="mt-4">
             <input type="hidden" ref={addonIdRef} />
             <label htmlFor="title" className="mb-1 block text-gray-500 text-sm">Addon Title</label>

@@ -200,7 +200,7 @@ export default function AppBar() {
 
   return (
     <>
-      <div className="flex items-center justify-between px-4 py-3 border-b border-restro-border-green-light w-full bg-white">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-restro-border-green-light w-full bg-white sticky top-0 backdrop-blur-md z-[9999]">
         {/* search */}
         <button
           onClick={btnShowSearchModal}
@@ -253,7 +253,7 @@ export default function AppBar() {
                 if(requiredScopes.length == 0) {
                   return true;
                 }
-    
+
                 return requiredScopes.some((scope)=>userScopes.includes(scope));
               })
               .filter((item)=>item.title.toLowerCase().includes(search.trim().toLowerCase())).map((item, index)=>{

@@ -1,44 +1,26 @@
 import React, { useEffect } from "react";
-import Logo from "../assets/logo.svg";
+import Logo from "../../assets/logo.svg";
 import { toast } from "react-hot-toast";
-import { signIn } from "../controllers/auth.controller";
 import { Link, useNavigate } from "react-router-dom";
-import { isRestroUserAuthenticated } from "../helpers/AuthStatus";
+import { isRestroUserAuthenticated } from "../../helpers/AuthStatus";
 import {
   getUserDetailsInLocalStorage,
   saveUserDetailsInLocalStorage,
-} from "../helpers/UserDetails";
-import { SCOPES } from "../config/scopes";
+} from "../../helpers/UserDetails";
+import { signIn } from "../../controllers/superadmin.controller";
 
-export default function LoginPage() {
+export default function SuperAdminLoginPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
     const restroAuthenticated = isRestroUserAuthenticated();
     if (restroAuthenticated) {
-      const { role, scope } = getUserDetailsInLocalStorage();
+      const { role } = getUserDetailsInLocalStorage();
       if (role == "superadmin") {
         navigate("/superadmin/dashboard/home", {
           replace: true,
         });
         return;
-      }
-      if (role == "admin") {
-        navigate("/dashboard/home", {
-          replace: true,
-        });
-        return;
-      }
-      const userScopes = scope.split(",");
-      if (userScopes.includes(SCOPES.DASHBOARD)) {
-        navigate("/dashboard/home", {
-          replace: true,
-        });
-        return;
-      } else {
-        navigate("/dashboard/profile", {
-          replace: true,
-        });
       }
     }
   }, []);
@@ -73,25 +55,10 @@ export default function LoginPage() {
         const user = res.data.user;
         saveUserDetailsInLocalStorage(user);
 
-        const { role, scope } = getUserDetailsInLocalStorage();
-        if (role == "admin") {
-          navigate("/dashboard/home", {
-            replace: true,
-          });
-          return;
-        }
-        const userScopes = scope.split(",");
-        if (userScopes.includes(SCOPES.DASHBOARD)) {
-          navigate("/dashboard/home", {
-            replace: true,
-          });
-          return;
-        } else {
-          navigate("/dashboard/profile", {
-            replace: true,
-          });
-        }
-
+        const { role } = getUserDetailsInLocalStorage();
+        navigate("/superadmin/dashboard/home", {
+          replace: true,
+        });
         return;
       } else {
         const message = res.data.message;
@@ -110,14 +77,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="bg-restro-green-light relative overflow-x-hidden md:overflow-hidden">
+   <div className="bg-restro-green-light relative overflow-x-hidden md:overflow-hidden">
 
       <img src="/assets/circle_illustration.svg" alt="illustration" className="absolute w-96 lg:w-[1024px] h-96 lg:h-[1024px]  lg:-bottom-96 lg:-right-52 -right-36 " />
 
       <div className="flex flex-col md:flex-row items-center justify-end md:justify-between gap-10 h-screen container mx-auto px-4 md:px-0 py-4 md:py-0 relative">
         <div>
-          <h3 className="text-2xl lg:text-6xl font-black text-restro-green-dark">Cafe. Restaurant.</h3>
-          <h3 className="text-2xl lg:text-6xl font-black text-restro-green-light outline-text">Hotel. Bar.</h3>
+          <h3 className="text-2xl lg:text-6xl font-black text-restro-green-dark">SuperAdmin</h3>
+          <h3 className="text-2xl lg:text-6xl font-black text-restro-green-light outline-text">Login.</h3>
         </div>
         <div className="bg-white rounded-2xl px-8 py-8 w-full sm:w-96 mx-8 sm:mx-0 shadow-2xl">
           <div className="flex items-center justify-between">
@@ -148,7 +115,6 @@ export default function LoginPage() {
                 <label className="block" htmlFor="password">
                   Password
                 </label>
-                <Link className="block text-xs text-gray-500" to="/forgot-password">Forgot Password?</Link>
               </div>
               <input
                 type="password"
@@ -167,22 +133,9 @@ export default function LoginPage() {
               Login
             </button>
 
-            <div className="flex items-center gap-4 my-4">
-              <div className="flex-1 border-b"></div>
-              <p className="text-sm text-gray-400">OR</p>
-              <div className="flex-1 border-b"></div>
-            </div>
-
-            <Link
-              to="/register"
-              className="block w-full text-center bg-slate-100 text-slate-500 rounded-xl px-4 py-3 transition hover:scale-105 active:scale-95 hover:shadow-xl hover:bg-slate-200 hover:shadow-slate-800/10"
-            >
-              Create Account
-            </Link>
-
           </form>
         </div>
       </div>
     </div>
-  );
+  )
 }
