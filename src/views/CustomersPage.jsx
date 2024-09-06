@@ -12,6 +12,7 @@ import {
   IconPlus,
   IconUser,
   IconX,
+  IconInfoSquareRounded
 } from "@tabler/icons-react";
 import { iconStroke } from "../config/config";
 import DialogAddCustomer from "../components/DialogAddCustomer";
@@ -41,6 +42,8 @@ export default function CustomersPage() {
   const emailRef = useRef();
   const genderRef = useRef();
   const birthDateRef = useRef();
+  const notesRef = useRef();
+
 
   const searchRef = useRef();
   const [state, setState] = useState({
@@ -63,6 +66,8 @@ export default function CustomersPage() {
   }
 
   const { customers, currentPage, totalPages, totalCustomers } = data;
+
+  console.log("Customers " , customers);
 
   // pagination
   const btnPaginationFirstPage = () => {
@@ -137,7 +142,7 @@ export default function CustomersPage() {
   };
   const btnClearSearch = () => {
     searchRef.current.value = null;
-    
+
     setState({
       ...state,
       search: "",
@@ -146,10 +151,11 @@ export default function CustomersPage() {
   };
 
 
-  const btnShowUpdate = (phone, name, email, birthDate, gender) => {
+  const btnShowUpdate = (phone, name, email, birthDate, gender , notes) => {
     phoneRef.current.value = phone;
     nameRef.current.value = name;
     emailRef.current.value = email;
+    notesRef.current.value = notes;
 
     const bDate = new Date(birthDate);
 
@@ -165,6 +171,7 @@ export default function CustomersPage() {
     const email = emailRef.current.value || null;
     const gender = genderRef.current.value || null;
     const birthDate = birthDateRef.current.value || null;
+    const notes = notesRef.current.value || null;
 
     if(!phone) {
       toast.error("Please Provide Customer's Phone!");
@@ -189,7 +196,7 @@ export default function CustomersPage() {
 
     try {
       toast.loading("Please wait...");
-      const res = await updateCustomer(phone, name, email, birthDate, gender);
+      const res = await updateCustomer(phone, name, email, birthDate, gender , notes);
 
       if(res.status == 200) {
         phoneRef.current.value = null;
@@ -197,9 +204,10 @@ export default function CustomersPage() {
         emailRef.current.value = null;
         genderRef.current.value = null;
         birthDateRef.current.value = null;
+        notesRef.current.value = null;
 
         await mutate(APIURL);
-        
+
         toast.dismiss();
         toast.success(res.data.message);
       }
@@ -257,12 +265,12 @@ export default function CustomersPage() {
           <p className="text-gray-400">No Customers Found!</p>
         </div>
       )}
-      
+
       {
         customers?.length > 0 && <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
         {
           customers.map((customer, index)=>{
-            const {phone, name, email, gender, birth_date, created_at, updated_at} = customer;
+            const {phone, name, email, gender, birth_date, created_at, updated_at , notes} = customer;
 
             return (<div key={phone} className="border border-restro-border-green-light rounded-2xl px-4 py-5">
               <div className="flex items-center gap-2">
@@ -282,13 +290,24 @@ export default function CustomersPage() {
               <div className="mt-4 text-sm flex items-center gap-1 text-gray-500"><IconCalendarPlus stroke={iconStroke} size={18}/> {new Date(created_at).toLocaleString()}</div>
               {updated_at && <div className="text-sm flex items-center gap-1 text-gray-500"><IconCalendarTime stroke={iconStroke} size={18}/> {new Date(updated_at).toLocaleString()}</div>}
 
+              {
+                notes &&
+                <div className="tooltip tooltip-bottom"
+                data-tip={notes}
+                >
+                  <p className="mt-4 flex items-center gap-1 text-xs text-gray-500 cursor-pointer">
+                    <IconInfoSquareRounded size={18} stroke={iconStroke} /> Customer Notes
+                  </p>
+                </div>
+              }
+
               <div className="flex gap-4 mt-4">
-                <button onClick={()=>{btnShowUpdate(phone, name, email, birth_date, gender)}} className="btn btn-sm text-gray-500 flex-1">Edit</button>
+                <button onClick={()=>{btnShowUpdate(phone, name, email, birth_date, gender , notes)}} className="btn btn-sm text-gray-500 flex-1">Edit</button>
                 <button onClick={()=>{btnDelete(phone)}} className="btn text-red-400 btn-sm flex-1">Delete</button>
               </div>
             </div>
             )
-          }) 
+          })
         }
       </div>
       }
@@ -337,7 +356,7 @@ export default function CustomersPage() {
       {/* pagination */}
 
       {/* add dialog */}
-      <DialogAddCustomer APIURL={APIURL} />
+      <DialogAddCustomer APIURL={APIURL} onSuccess={null}/>
       {/* add dialog */}
 
       {/* update dialog */}
@@ -420,6 +439,19 @@ export default function CustomersPage() {
               <option value="other">Other</option>
             </select>
           </div>
+        </div>
+
+        <div>
+          <label htmlFor="notes" className="mb-1 block text-gray-500 text-sm">
+            Customer's Notes
+          </label>
+          <textarea
+            ref={notesRef}
+            type="text"
+            name="notes"
+            className="block text-base text-sm w-full border rounded-lg px-4 py-2 bg-gray-50 outline-restro-border-green-light h-20"
+            placeholder="Enter Customer's Notes"
+          />
         </div>
 
         <div className="modal-action">

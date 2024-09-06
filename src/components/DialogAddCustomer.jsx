@@ -11,6 +11,7 @@ export default function DialogAddCustomer({APIURL , onSuccess , phone = ""}) {
   const emailRef = useRef();
   const genderRef = useRef();
   const birthDateRef = useRef();
+  const notesRef = useRef();
 
   async function btnAdd() {
     const phone = phoneRef.current.value;
@@ -18,6 +19,7 @@ export default function DialogAddCustomer({APIURL , onSuccess , phone = ""}) {
     const email = emailRef.current.value || null;
     const gender = genderRef.current.value || null;
     const birthDate = birthDateRef.current.value || null;
+    const notes = notesRef.current.value || null;
 
     if(!phone) {
       toast.error("Please Provide Customer's Phone!");
@@ -42,7 +44,7 @@ export default function DialogAddCustomer({APIURL , onSuccess , phone = ""}) {
 
     try {
       toast.loading("Please wait...");
-      const res = await addCustomer(phone, name, email, birthDate, gender);
+      const res = await addCustomer(phone, name, email, birthDate, gender , notes);
 
       if(res.status == 200) {
         phoneRef.current.value = null;
@@ -50,8 +52,11 @@ export default function DialogAddCustomer({APIURL , onSuccess , phone = ""}) {
         emailRef.current.value = null;
         genderRef.current.value = null;
         birthDateRef.current.value = null;
+        notesRef.current.value = null;
 
-        onSuccess(phone, name, email, birthDate, gender);
+        if(onSuccess != null){
+            onSuccess(phone, name, email, birthDate, gender , notes);
+        }
 
         await mutate(APIURL);
         toast.dismiss();
@@ -149,6 +154,18 @@ export default function DialogAddCustomer({APIURL , onSuccess , phone = ""}) {
           </div>
         </div>
 
+        <div>
+          <label htmlFor="notes" className="mb-1 block text-gray-500 text-sm">
+            Customer's Notes
+          </label>
+          <textarea
+            ref={notesRef}
+            type="text"
+            name="notes"
+            className="block text-base text-sm w-full border rounded-lg px-4 py-2 bg-gray-50 outline-restro-border-green-light h-20"
+            placeholder="Enter Customer's Notes"
+          />
+        </div>
 
         <div className="modal-action">
 

@@ -178,10 +178,13 @@ export default function ReservationPage() {
         toast.dismiss();
 
         const customer = res.data;
+        console.log("customer" , customer);
+
         setState({
           ...state,
           customer: customer,
         });
+
       } else {
         toast.dismiss();
         toast.error(res.data.message);
@@ -408,6 +411,7 @@ export default function ReservationPage() {
               table_title,
               status,
               notes,
+              customer_notes,
               people_count,
               unique_code,
               created_at,
@@ -437,6 +441,7 @@ export default function ReservationPage() {
               customer_name={customer_name}
               dateLocal={dateLocal}
               notes={notes}
+              customer_notes={customer_notes}
               people_count={people_count}
               status={status}
               table_title={table_title}
@@ -472,6 +477,7 @@ export default function ReservationPage() {
               table_title,
               status,
               notes,
+              customer_notes,
               people_count,
               unique_code,
               created_at,
@@ -501,6 +507,7 @@ export default function ReservationPage() {
               customer_name={customer_name}
               dateLocal={dateLocal}
               notes={notes}
+              customer_notes={customer_notes}
               people_count={people_count}
               status={status}
               table_title={table_title}
@@ -623,6 +630,7 @@ export default function ReservationPage() {
                 // email={state.customer.email}
                 birth_date={state.customer.birth_date}
                 gender={state.customer.gender}
+                customer_notes={state.customer.notes}
                 // created_at={state.customer.created_at}
                 btnAction={() => {
                   clearSelectedCustomer();
@@ -865,11 +873,11 @@ export default function ReservationPage() {
       {/* update dialog */}
 
       {/* add dialog */}
-      <DialogAddCustomer APIURL={null} onSuccess={(phone, name, email, birth_date, gender) => {
+      <DialogAddCustomer APIURL={null} onSuccess={(phone, name, email, birth_date, gender , notes) => {
         setState({
           ...state,
           customer:{
-            phone, name , email , birth_date , gender
+            phone, name , email , birth_date , gender, notes
           },
         });
 

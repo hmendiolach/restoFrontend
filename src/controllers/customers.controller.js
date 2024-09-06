@@ -23,7 +23,7 @@ export async function searchCustomer(search) {
   }
 }
 
-export async function addCustomer(phone, name, email, birthDate, gender) {
+export async function addCustomer(phone, name, email, birthDate, gender , notes) {
   try {
     const response = await ApiClient.post("/customers/add", {
       phone,
@@ -31,6 +31,7 @@ export async function addCustomer(phone, name, email, birthDate, gender) {
       email,
       birthDate,
       gender,
+      notes
     });
     return response;
   } catch (error) {
@@ -38,13 +39,14 @@ export async function addCustomer(phone, name, email, birthDate, gender) {
   }
 }
 
-export async function updateCustomer(phone, name, email, birthDate, gender) {
+export async function updateCustomer(phone, name, email, birthDate, gender , notes) {
   try {
     const response = await ApiClient.post(`/customers/${phone}/update`, {
       name,
       email,
       birthDate,
       gender,
+      notes
     });
     return response;
   } catch (error) {

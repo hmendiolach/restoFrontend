@@ -4,7 +4,7 @@ import {
   IconCalendarX,
   IconFriends,
   IconPencil,
-  IconInfoSquareRounded
+  IconInfoSquareRounded,
 } from "@tabler/icons-react";
 import { iconStroke } from "../config/config";
 export default function ReservationCard({
@@ -15,6 +15,7 @@ export default function ReservationCard({
   people_count,
   table_title,
   notes,
+  customer_notes,
   status,
   createdAt,
   btnUpdate,
@@ -25,10 +26,10 @@ export default function ReservationCard({
       key={unique_code}
       className="text-restro-green-dark border border-restro-border-green-light rounded-2xl p-4 flex gap-4 items-center"
     >
-      <div className="w-20 h-full text-base text-gray-500 py-2 font-bold text-center rounded-lg flex items-center justify-center bg-gray-100">
+      <div className="w-20 h-full text-base text-gray-500 py-2 font-bold text-center rounded-lg flex items-center justify-center bg-gray-100 flex-1 px-1">
         {dateLocal}
       </div>
-      <div className="flex-1">
+      <div className="flex-2">
         <p className="text-gray-500 text-sm">{timeLocal}</p>
         <p className="font-bold text-xl">{customer_name}</p>
         <div className="flex items-center gap-4 text-sm text-restro-green-dark">
@@ -44,7 +45,14 @@ export default function ReservationCard({
         {notes && (
           <div className="tooltip tooltip-bottom" data-tip={notes}>
             <p className="mt-1 flex items-center gap-1 text-xs text-gray-500 cursor-pointer">
-              <IconInfoSquareRounded size={18} stroke={iconStroke} /> View Notes
+              <IconInfoSquareRounded size={18} stroke={iconStroke} /> Reservation Notes
+            </p>
+          </div>
+        )}
+        {customer_notes && (
+          <div className="tooltip tooltip-bottom" data-tip={customer_notes}>
+            <p className="flex items-center gap-1 text-xs text-gray-500 cursor-pointer">
+              <IconInfoSquareRounded size={18} stroke={iconStroke} /> Customer Notes
             </p>
           </div>
         )}
@@ -52,7 +60,7 @@ export default function ReservationCard({
         <p className="text-xs text-gray-400">Created at: {createdAt}</p>
       </div>
 
-      <div className="flex items-center">
+      <div className="flex items-center flex-1">
         <button
           onClick={btnUpdate}
           className="w-6 h-6 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition active:scale-95"

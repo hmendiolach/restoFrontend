@@ -1,8 +1,8 @@
-import { IconCalendarPlus, IconCalendarTime, IconMail, IconPhone, IconUser, IconX } from "@tabler/icons-react";
+import { IconCalendarPlus, IconCalendarTime, IconMail, IconPhone, IconUser, IconX , IconInfoSquareRounded } from "@tabler/icons-react";
 import React from "react";
 import { iconStroke } from "../config/config";
 
-export default function CustomerCard({phone, name, email, birth_date=null, gender=null, created_at=null, btnAction = null}) {
+export default function CustomerCard({phone, name, email, birth_date=null, gender=null, created_at=null, btnAction = null , customer_notes}) {
   return (
     <div
       className="border border-restro-border-green-light rounded-2xl px-4 py-5"
@@ -40,6 +40,17 @@ export default function CustomerCard({phone, name, email, birth_date=null, gende
           Gender: {gender}
         </p>
       )}
+
+        {
+          customer_notes &&
+          <div className="tooltip tooltip-bottom"
+          data-tip={customer_notes}
+          >
+            <p className="mt-4 flex items-center gap-1 text-xs text-gray-500 cursor-pointer">
+              <IconInfoSquareRounded size={18} stroke={iconStroke} /> Customer Notes
+            </p>
+          </div>
+        }
 
       {created_at && <div className="mt-4 text-sm flex items-center gap-1 text-gray-500">
         <IconCalendarPlus stroke={iconStroke} size={18} />{" "}
