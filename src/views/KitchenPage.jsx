@@ -230,6 +230,7 @@ export default function KitchenPage() {
                       status,
                       date,
                       addons,
+                      ingredients,
                       notes,
                     } = item;
 
@@ -248,6 +249,7 @@ export default function KitchenPage() {
                         <p>{item_title} {variant_title} x {quantity}</p>
                         {addonsText && <p className="text-sm text-gray-700">Addons: {addonsText}</p>}
                         {notes && <p className="text-sm text-gray-700">Notes: {notes}</p>}
+                        {ingredients && <p className="text-sm text-gray-700">Ingredients: {ingredients}</p>}
                       </div>
                       {/* item title */}
     

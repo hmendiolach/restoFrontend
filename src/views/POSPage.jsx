@@ -55,6 +55,7 @@ export default function POSPage() {
     selectedCategory: "all",
 
     selectedItemId: null,
+    selectedItemIngredients: [],
 
     drafts: [],
 
@@ -215,10 +216,21 @@ export default function POSPage() {
   // category filter modal
 
   // variant, addon modal
-  const btnOpenVariantAndAddonModal = (menuItemId) => {
+  const btnRemoveSelectedItemIngredient = (i) => {
+    const newIngredients = state.selectedItemIngredients.filter((_,index)=>i!==index);
     setState({
       ...state,
-      selectedItemId: menuItemId
+      selectedItemIngredients: newIngredients,
+    })
+  }
+
+  const btnOpenVariantAndAddonModal = (menuItemId) => {
+    const ingredients = menuItems.find((item)=>item.id==menuItemId)?.ingredients || []
+    
+    setState({
+      ...state,
+      selectedItemId: menuItemId,
+      selectedItemIngredients: ingredients,
     })
     document.getElementById('modal-variants-addons').showModal()
   }
@@ -263,7 +275,9 @@ export default function POSPage() {
       });
     }
 
-    const itemCart = {...selectedItem, price: price, variant_id: selectedVariantId, variant: selectedVariant, addons_ids: selectedAddonsId, addons: selectedAddons}
+    const ingredients = state.selectedItemIngredients.join(",");
+
+    const itemCart = {...selectedItem, price: price, variant_id: selectedVariantId, variant: selectedVariant, addons_ids: selectedAddonsId, addons: selectedAddons, ingredients: ingredients}
     addItemToCart(itemCart)
   };
   // variant, addon modal
@@ -650,11 +664,12 @@ export default function POSPage() {
 
                 <div className='mt-2'>
                     <button onClick={()=>{
-                      if(hasVariantOrAddon) {
-                        btnOpenVariantAndAddonModal(id);
-                      } else {
-                        addItemToCart(menuItem);
-                      }
+                      // if(hasVariantOrAddon) {
+                      //   btnOpenVariantAndAddonModal(id);
+                      // } else {
+                      //   addItemToCart(menuItem);
+                      // }
+                      btnOpenVariantAndAddonModal(id);
                     }} className='rounded-full px-4 py-1 bg-restro-green hover:bg-restro-green-dark transition active:scale-95 text-white flex items-center justify-center'>
                       Add
                     </button>
@@ -708,7 +723,8 @@ export default function POSPage() {
           <div className='flex-1 flex flex-col gap-4 overflow-y-auto px-4 pb-36'>
             <div className="h-4"></div>
             {cartItems?.map((cartItem, i)=>{
-              const {quantity, notes, title, price, variant, addons} = cartItem;
+              const {quantity, notes, title, price, variant, addons, ingredients} = cartItem;
+              
               const itemTotal = price * quantity;
               return <div key={i} className='text-sm border border-restro-border-green-light rounded-lg p-2 relative'>
                 <p>#{i+1} {title} x {quantity}</p>
@@ -720,6 +736,8 @@ export default function POSPage() {
 
                 {variant && <p className="mt-1 text-xs text-gray-400">Variant: {variant.title}</p>}
                 {(addons && addons?.length > 0 ) && <p className="mt-1 text-xs text-gray-400">Addons: {addons?.map((addon)=>(`${addon.title}`))?.join(", ")}</p>}
+
+                {ingredients && <p className="mt-1 text-xs text-gray-400">Ingredients: {ingredients}</p>}
 
                 <div className="flex items-center justify-between gap-2 w-full mt-4">
                   <div className='flex items-center gap-2'>
@@ -834,7 +852,7 @@ export default function POSPage() {
       {/* dialog: variants & addons */}
       <dialog id="modal-variants-addons" className="modal modal-bottom sm:modal-middle">
         <div className="modal-box">
-          <h3 className="font-bold text-lg">Select Variant & Addons</h3>
+          <h3 className="font-bold text-lg">Select Variant, Addons & Ingredients</h3>
           
           <div className="my-4 flex gap-2">
             <div className="flex-1">
@@ -862,6 +880,24 @@ export default function POSPage() {
                 })
               }
               </div>
+            </div>
+          </div>
+
+          <div className="divider"></div>
+
+          <div className="mb-4">
+            <h3>Ingredients</h3>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {
+                state?.selectedItemIngredients?.map((ingredient, index)=>{
+                  return <div key={index} className='rounded-full py-1 px-2 bg-gray-100 text-gray-500 flex items-center gap-1'>
+                    <p>{ingredient}</p>
+                    <button onClick={()=>btnRemoveSelectedItemIngredient(index)} className='btn btn-circle btn-xs bg-red-100 text-red-500'>
+                      <IconTrash stroke={iconStroke} />
+                    </button>
+                  </div>
+                })
+              }
             </div>
           </div>
 

@@ -619,6 +619,7 @@ export default function OrdersPage() {
                             status,
                             date,
                             addons,
+                            ingredients,
                             notes,
                           } = item;
 
@@ -672,6 +673,11 @@ export default function OrdersPage() {
                                 {notes && (
                                   <p className="text-sm text-gray-700">
                                     Notes: {notes}
+                                  </p>
+                                )}
+                                {ingredients && (
+                                  <p className="text-sm text-gray-700">
+                                    Ingredients: {ingredients}
                                   </p>
                                 )}
                               </div>
