@@ -108,13 +108,13 @@ export default function QRMenuPage() {
     }
   }
 
-  const btnOpenMenuItemDetail = (addons, variants, category_id, category_title, id, imageURL, price, title) => {
+  const btnOpenMenuItemDetail = (addons, variants, category_id, category_title, id, imageURL, price, title, ingredients) => {
     setState({
       ...state,
       currentItem: {
         addons: addons, variants: variants,
         category_id: category_id, category_title: category_title,
-        id, image: imageURL, price, title
+        id, image: imageURL, price, title, ingredients
       }
     })
     document.getElementById("modal_item_detail").showModal();
@@ -212,14 +212,14 @@ export default function QRMenuPage() {
               }
               return new String(menuItem.title).trim().toLowerCase().includes(searchQuery.trim().toLowerCase());
             }).map((item, i)=>{
-              const {addons, variants, category_id, category_title, id, image, price, title} = item;
+              const {addons, variants, category_id, category_title, id, image, price, title, ingredients} = item;
               // addon {id, item_id, title, price}
               // variant {id, item_id, title, price}
 
               const imageURL = getImageURL(image);
 
               return <div key={id} onClick={()=>{
-                btnOpenMenuItemDetail(addons, variants, category_id, category_title, id, image?imageURL:null, price, title)
+                btnOpenMenuItemDetail(addons, variants, category_id, category_title, id, image?imageURL:null, price, title, ingredients)
               }} className='w-full rounded-3xl px-4 py-4 flex gap-4 hover:bg-gray-100 transition active:scale-95 cursor-pointer'>
                 <div className=' rounded-2xl w-32 h-32 object-cover relative bg-gray-200 flex items-center justify-center text-gray-500 '>
                   {image ? <img src={imageURL} alt={title} className='w-full h-full absolute top-0 left-0 rounded-2xl object-cover z-0' /> : <IconCarrot />}
@@ -322,6 +322,19 @@ export default function QRMenuPage() {
                     return <label key={index} className='cursor-pointer label justify-start gap-2'>
                       <input type="checkbox" name="addons" id="" className='checkbox  checkbox-sm' value={id} /><span className="label-text">{title} (+{currencySymbol.symbol}{price})</span>
                     </label>
+                  })
+                }
+                </div>
+              </div>}
+
+              {currentItem?.ingredients?.length > 0 && <div className="flex-1">
+                <h3>Ingredients</h3>
+                <div className="flex flex-wrap gap-2 mt-2">
+                {
+                  currentItem?.ingredients?.map((ingredient, index)=>{
+                    return <div key={index} className='badge'>
+                      {ingredient}
+                    </div>
                   })
                 }
                 </div>
