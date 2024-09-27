@@ -146,3 +146,14 @@ export async function deleteMenuItemAddon(itemId, addonId) {
     throw error;
   }
 };
+
+export async function addMenuItemIngredients(itemId, ingredients) {
+  try {
+    const response = await ApiClient.post(`/menu-items/ingredients/${itemId}/add`, {
+      ingredients: ingredients
+    });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}

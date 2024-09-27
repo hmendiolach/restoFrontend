@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import Page from "../../components/Page";
 import { Link, useParams } from "react-router-dom";
-import { addMenuItemAddon, addMenuItemVariant, deleteMenuItemAddon, deleteMenuItemVariant, removeMenuItemPhoto, updateMenuItem, updateMenuItemAddon, updateMenuItemVariant, uploadMenuItemPhoto, useMenuItem } from "../../controllers/menu_item.controller";
+import { addMenuItemAddon, addMenuItemIngredients, addMenuItemVariant, deleteMenuItemAddon, deleteMenuItemVariant, removeMenuItemPhoto, updateMenuItem, updateMenuItemAddon, updateMenuItemVariant, uploadMenuItemPhoto, useMenuItem } from "../../controllers/menu_item.controller";
 import { useCategories, useTaxes } from "../../controllers/settings.controller";
 import toast from "react-hot-toast";
 import { mutate } from "swr";
@@ -33,6 +33,8 @@ export default function MenuItemViewPage() {
   const addonIdRef = useRef();
   const addonTitleUpdateRef = useRef();
   const addonPriceUpdateRef = useRef();
+
+  const ingredientRef = useRef();
 
   const {
     APIURL: APIURLCategories,
@@ -87,6 +89,7 @@ export default function MenuItemViewPage() {
     net_price,
     addons,
     variants,
+    ingredients,
     image
   } = menuItem;
   const imageURL = image ? getImageURL(image) : null;
@@ -395,6 +398,67 @@ export default function MenuItemViewPage() {
     }
   }
 
+  async function btnAddIngredients() {
+    const ingredientsText = ingredientRef.current.value;
+
+    if(!ingredientsText) {
+      toast.error("Please provide ingredients!");
+      return;
+    }
+
+    const ingredientsArr = new String(ingredientsText).split(",").map((i)=>i.trim());
+
+    const newIngredients = ingredients || [];
+    newIngredients.push(...ingredientsArr);
+
+    try {
+      toast.loading("Please wait...");
+      toast.dismiss();
+      
+      const res = await addMenuItemIngredients(id, newIngredients);
+
+      if(res.status == 200) {
+        ingredientRef.current.value = null;
+
+        await mutate(APIURL);
+        toast.dismiss();
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      const message = error?.response?.data?.message || "Something went wrong!";
+      console.error(error);
+
+      toast.dismiss();
+      toast.error(message);
+    }
+  }
+
+  async function btnDeleteIngredient(i) {
+    
+    const newIngredients = ingredients?.filter((v,index)=>i !== index);
+
+    try {
+      toast.loading("Please wait...");
+      toast.dismiss();
+      
+      const res = await addMenuItemIngredients(id, newIngredients);
+
+      if(res.status == 200) {
+        ingredientRef.current.value = null;
+
+        await mutate(APIURL);
+        toast.dismiss();
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      const message = error?.response?.data?.message || "Something went wrong!";
+      console.error(error);
+
+      toast.dismiss();
+      toast.error(message);
+    }
+  }
+
   return (
     <Page className="px-4 md:px-8 py-3 md:py-6">
       <div className="text-sm breadcrumbs">
@@ -628,6 +692,37 @@ export default function MenuItemViewPage() {
           </div>
           {/* addons */}
 
+          {/* ingredients */}
+          <div className="collapse bg-gray-50 collapse-arrow mt-4">
+            <input type="checkbox" />
+            <div className="collapse-title font-medium">
+              Show Ingredients
+            </div>
+            <div className="collapse-content flex flex-col">
+              {
+                ingredients.map((ingredient, index)=>{
+                  return <div key={index} className="flex items-center justify-between hover:bg-gray-100 transition p-2 rounded-lg cursor-pointer">
+                    <div className="flex-1">
+                      <p>{ingredient}</p>
+                    </div>
+                    <div className="flex items-center">
+                      <button
+                        onClick={() => {
+                          btnDeleteIngredient(index);
+                        }}
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-red-500 hover:bg-gray-200 transition active:scale-95"
+                      >
+                        <IconTrash stroke={iconStroke} />
+                      </button>
+                    </div>
+                  </div>
+                })
+              }
+              <button onClick={()=>document.getElementById('modal-add-ingredients').showModal()} className="btn btn-sm mt-4">Add Ingredients</button>
+            </div>
+          </div>
+          {/* ingredients */}
+
         </div>
       </div>
 
@@ -744,6 +839,27 @@ export default function MenuItemViewPage() {
         </div>
       </dialog>
       {/* addon update dialog */}
+
+      {/* ingredients add dialog */}
+      <dialog id="modal-add-ingredients" className="modal modal-bottom sm:modal-middle">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg">Add New Ingredient</h3>
+
+          <div className="mt-4">
+            <label htmlFor="ingredient" className="mb-1 block text-gray-500 text-sm">Ingredient</label>
+            <input ref={ingredientRef} type="text" name="ingredient" className="text-sm w-full border rounded-lg px-4 py-2 bg-gray-50 outline-restro-border-green-light" placeholder="Write Ingredients Comma Separated"  />
+          </div>
+
+          <div className="modal-action">
+            <form method="dialog">
+              {/* if there is a button in form, it will close the modal */}
+              <button className="rounded-lg hover:bg-gray-200 transition active:scale-95 hover:shadow-lg px-4 py-3 bg-gray-200 text-gray-500">Close</button>
+              <button onClick={()=>{btnAddIngredients();}} className="rounded-lg hover:bg-green-800 transition active:scale-95 hover:shadow-lg px-4 py-3 bg-restro-green text-white ml-3">Save</button>
+            </form>
+          </div>
+        </div>
+      </dialog>
+      {/* ingredients add dialog */}
     </Page>
   );
 }
