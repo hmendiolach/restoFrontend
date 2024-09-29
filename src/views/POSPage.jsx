@@ -235,7 +235,11 @@ export default function POSPage() {
     document.getElementById('modal-variants-addons').showModal()
   }
   const btnAddMenuItemToCartWithVariantsAndAddon = () => {
-    let price = 0;
+    // get selected menu item
+    const selectedItem = menuItems.find((item)=>item.id == selectedItemId);
+    
+    let price = selectedItem.price || 0;
+
     let selectedVariantId = null;
     const selectedAddonsId = [];
 
@@ -253,9 +257,6 @@ export default function POSPage() {
         selectedAddonsId.push(item.value);
       }
     })
-
-    // get selected menu item
-    const selectedItem = menuItems.find((item)=>item.id == selectedItemId);
 
     const addons = selectedItem?.addons || [];
     const variants = selectedItem?.variants || [];
