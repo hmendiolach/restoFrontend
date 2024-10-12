@@ -249,7 +249,15 @@ export default function KitchenPage() {
                         <p>{item_title} {variant_title} x {quantity}</p>
                         {addonsText && <p className="text-sm text-gray-700">Addons: {addonsText}</p>}
                         {notes && <p className="text-sm text-gray-700">Notes: {notes}</p>}
-                        {ingredients && <p className="text-sm text-gray-700">Ingredients: {ingredients}</p>}
+                        {ingredients && <div className="text-sm text-gray-700">Ingredients:
+                           <div className="flex flex-wrap gap-1">
+                           {ingredients?.map((ingredient, i)=><div className="flex items-center">
+                            {ingredient.include ? <IconCheck className="text-green-500" size={14} stroke={iconStroke} />: <IconX className="text-red-500" size={14} stroke={iconStroke} />} 
+                            {ingredient.title}
+                           </div>)}
+                           </div>
+                        </div>
+                        }
                       </div>
                       {/* item title */}
     
