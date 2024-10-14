@@ -33,6 +33,7 @@ import { getUserDetailsInLocalStorage } from "../helpers/UserDetails";
 
 export default function OrdersPage() {
   const printReceiptRef = useRef();
+  const user = getUserDetailsInLocalStorage();
   const { socket, isSocketConnected } = useContext(SocketContext);
 
   const [state, setState] = useState({
@@ -136,6 +137,7 @@ export default function OrdersPage() {
   const _initSocket = () => {
     const audio = new Audio("/new_order_sound.mp3");
     if (isSocketConnected) {
+      socket.emit("authenticate", user.tenant_id);
       socket.on("new_order", (payload) => {
         console.log(payload);
         // textToSpeech(`New order received, token number: ${payload}`)
@@ -149,6 +151,7 @@ export default function OrdersPage() {
       });
     } else {
       initSocket();
+      socket.emit("authenticate", user.tenant_id);
       socket.on("new_order", (payload) => {
         console.log(payload);
         // textToSpeech(`New order received, token number: ${payload}`);

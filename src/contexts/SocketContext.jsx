@@ -8,12 +8,13 @@ const SocketProvider = ({ children }) => {
   const [isSocketConnected, setIsSocketConnected] = useState(false);
 
   useEffect(() => {
-    const user = getUserDetailsInLocalStorage();
-
     initSocket();
 
     socket.on('connect', () => {
-      socket.emit("authenticate", user.tenant_id);
+      const user = getUserDetailsInLocalStorage();
+      if(user) {
+        socket.emit("authenticate", user.tenant_id);
+      }
       setIsSocketConnected(true)
     });
     socket.on('disconnect', () => setIsSocketConnected(false));

@@ -9,6 +9,7 @@ import { initSocket } from "../utils/socket";
 import { textToSpeech } from "../utils/textToSpeech";
 import { getUserDetailsInLocalStorage } from "../helpers/UserDetails";
 export default function KitchenPage() {
+  const user = getUserDetailsInLocalStorage();
   const { socket, isSocketConnected } = useContext(SocketContext);
 
   const [state, setState] = useState({
@@ -51,6 +52,7 @@ export default function KitchenPage() {
   const _initSocket = () => {
     const audio = new Audio("/new_order_sound.mp3");
     if(isSocketConnected) {
+      socket.emit("authenticate", user.tenant_id);
       socket.on('new_order', (payload)=>{
         console.log(payload);
         // textToSpeech(`New order received, token number: ${payload}`)
@@ -64,6 +66,7 @@ export default function KitchenPage() {
       });
     } else {
       initSocket();
+      socket.emit("authenticate", user.tenant_id);
       socket.on('new_order', (payload)=>{
         console.log(payload);
         // textToSpeech(`New order received, token number: ${payload}`)
