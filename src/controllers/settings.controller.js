@@ -14,11 +14,11 @@ export function useStoreSettings() {
   };
 }
 
-export async function saveStoreSettings(storeName, address, phone, email, currency, image, isQRMenuEnabled) {
+export async function saveStoreSettings(storeName, address, phone, email, currency, image, isQRMenuEnabled , isQRPaymentsEnabled) {
   try {
     const response = await ApiClient.post("/settings/store-setting", {
       storeName, address, phone, email, currency, image,
-      isQRMenuEnabled
+      isQRMenuEnabled,isQRPaymentsEnabled
     });
     return response;
   } catch (error) {

@@ -16,6 +16,7 @@ export default function SettingDetailsPage() {
   const phoneRef = useRef();
   const currencyRef = useRef();
   const isQRMenuEnabledRef = useRef();
+  const isQRPaymentsEnabledRef = useRef();
 
   const { APIURL, data, error, isLoading } = useStoreSettings();
 
@@ -28,7 +29,7 @@ export default function SettingDetailsPage() {
     return <Page className="px-8 py-6">Error loading data, Try Later!</Page>;
   }
 
-  const { storeName, email, address, phone, currency, isQRMenuEnabled, uniqueQRCode } = data;
+  const { storeName, email, address, phone, currency, isQRMenuEnabled, uniqueQRCode , isQRPaymentsEnabled } = data;
   const QR_MENU_LINK = getQRMenuLink(uniqueQRCode);
 
   const btnSave = async () => {
@@ -38,18 +39,20 @@ export default function SettingDetailsPage() {
     const phone = phoneRef.current.value;
     const currency = currencyRef.current.value;
     const isQRMenuEnabled = isQRMenuEnabledRef.current.checked;
+    const isQRPaymentsEnabled = isQRPaymentsEnabledRef.current.checked;
+
 
     try {
 
       toast.loading("Please wait...");
-      const res = await saveStoreSettings(storeName, address, phone, email, currency, null, isQRMenuEnabled);
+      const res = await saveStoreSettings(storeName, address, phone, email, currency, null, isQRMenuEnabled , isQRPaymentsEnabled);
 
       if(res.status == 200) {
         await mutate(APIURL);
         toast.dismiss();
         toast.success(res.data.message);
       }
-      
+
     } catch (error) {
       const message = error?.response?.data?.message || "Something went wrong!";
       console.error(error);
@@ -190,6 +193,28 @@ export default function SettingDetailsPage() {
             </a>
           </div>
         }
+
+        <div className="w-full lg:min-w-96 flex items-center justify-between mt-4">
+          <label htmlFor="acceptqrpayments" className="flex items-center gap-2">
+            Accept Payments Via QR in Receipts
+            <Popover text="If enabled, a QR code for the order will be printed on receipts, allowing customers to pay easily." />
+          </label>
+
+          {/* switch */}
+          <label className="relative inline-flex items-center cursor-pointer no-drag">
+            <input
+              ref={isQRPaymentsEnabledRef}
+              defaultChecked={isQRPaymentsEnabled}
+              type="checkbox"
+              name="acceptqrpayments"
+              id="acceptqrpayments"
+              value=""
+              className="sr-only peer"
+            />
+            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-gray-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-restro-green peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"></div>
+          </label>
+          {/* switch */}
+        </div>
 
         <button onClick={btnSave} className="text-white w-full lg:min-w-96 bg-restro-green transition hover:bg-restro-green/80 active:scale-95 rounded-lg px-4 py-2 mt-6 outline-restro-border-green-light">
           Save
