@@ -253,3 +253,25 @@ export async function removeDevice(deviceId) {
     throw error;
   }
 };
+
+export function usePaymentDetails() {
+  const APIURL = `/settings/payment-details`;
+  const { data, error, isLoading } = useSWR(APIURL, fetcher);
+  return {
+    data,
+    error,
+    isLoading,
+    APIURL,
+  };
+}
+
+export async function savePaymentDetails(stripeSecret ,  stripeWebhookSecret) {
+  try {
+    const response = await ApiClient.post(`/settings/save-payment-details`, {
+      stripeSecret , stripeWebhookSecret
+    })
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};

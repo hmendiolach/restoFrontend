@@ -106,3 +106,17 @@ export async function cancelSubscription(subscriptionId) {
         throw error;
     }
 }
+
+export async function getStripePaymentURL({amount , currency , uniqueCode}) {
+    try {
+        const response = await ApiClient.post(`${API}/auth/accept-order-payment-via-stripe`, {
+            amount,
+            currency,
+            uniqueCode
+        });
+
+        return response;
+    } catch (error) {
+        throw error;
+    }
+}

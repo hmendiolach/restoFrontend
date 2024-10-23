@@ -42,3 +42,12 @@ export async function searchInvoices(query) {
     throw error;
   }
 }
+
+export async function getInvoiceByCode(code) {
+  try {
+    const res = await ApiClient.get(`/invoices/${code}`);
+    return res;
+  } catch (error) {
+    throw error;
+  }
+}
