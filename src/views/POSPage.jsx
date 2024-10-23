@@ -12,6 +12,9 @@ import { SocketContext } from "../contexts/SocketContext";
 import { initSocket } from '../utils/socket';
 import { getImageURL } from '../helpers/ImageHelper';
 import { getUserDetailsInLocalStorage } from '../helpers/UserDetails';
+import QRCode from "qrcode";
+import { getQRPaymentsLink } from '../config/config';
+
 export default function POSPage() {
   const user = getUserDetailsInLocalStorage();
   const { socket, isSocketConnected } = useContext(SocketContext);
@@ -189,7 +192,7 @@ export default function POSPage() {
     newCartItems[index].notes = notes;
 
     setState({
-      ...state, 
+      ...state,
       cartItems: newCartItems
     })
   };
@@ -226,7 +229,7 @@ export default function POSPage() {
 
   const btnOpenVariantAndAddonModal = (menuItemId) => {
     const ingredients = menuItems.find((item)=>item.id==menuItemId)?.ingredients || []
-    
+
     setState({
       ...state,
       selectedItemId: menuItemId,
@@ -237,7 +240,7 @@ export default function POSPage() {
   const btnAddMenuItemToCartWithVariantsAndAddon = () => {
     // get selected menu item
     const selectedItem = menuItems.find((item)=>item.id == selectedItemId);
-    
+
     let price = selectedItem.price || 0;
 
     let selectedVariantId = null;
@@ -301,7 +304,7 @@ export default function POSPage() {
       nameRef: nameRef,
       date,
       cart: cartItems
-    }; 
+    };
 
     drafts.push(draftItem);
 
@@ -426,7 +429,7 @@ export default function POSPage() {
       } else if (taxType == "inclusive") {
         const tax = itemPrice - (itemPrice * (100 / (100 + taxRate)));
         const priceWithoutTax = itemPrice - tax;
-        
+
         taxTotal += tax;
         itemsTotal += priceWithoutTax;
         payableTotal += itemPrice;
@@ -447,11 +450,23 @@ export default function POSPage() {
     setState({
       ...state,
       itemsTotal,
-      taxTotal, 
+      taxTotal,
       payableTotal
     });
     document.getElementById('modal-pay-and-send-kitchen-summary').showModal();
   }
+
+  const generateReceiptQR = async (uniqueCode) => {
+    try {
+      const QR_PAYMENTS_LINK = getQRPaymentsLink(uniqueCode);
+      const qrDataURL = await QRCode.toDataURL(QR_PAYMENTS_LINK, { width: 1080 });
+      return qrDataURL;
+    } catch (error) {
+      console.error("QR Code generation failed:", error);
+      return null;
+    }
+  };
+
   const btnPayAndSendToKitchen = async () => {
     try {
       const deliveryType = diningOptionRef.current.value;
@@ -467,18 +482,19 @@ export default function POSPage() {
         toast.success(res.data.message);
         document.getElementById("modal-pay-and-send-kitchen-summary").close();
 
-        const {
-          page_format,
-          is_enable_print,
-        } = printSettings;
+        const qrCodeURL = await generateReceiptQR(data.uniqueCode);
+
+        const page_format = printSettings?.page_format || null;
+        const is_enable_print = printSettings?.is_enable_print || 0;
 
         setDetailsForReceiptPrint({
           cartItems, deliveryType, customerType, customer, tableId, currency, storeSettings, printSettings,
           itemsTotal: state.itemsTotal,
           taxTotal: state.taxTotal,
-          payableTotal: state.payableTotal, 
+          payableTotal: state.payableTotal,
           tokenNo: data.tokenNo,
-          orderId: data.orderId
+          orderId: data.orderId,
+          qrCodeURL
         });
 
         sendNewOrderEvent(data.tokenNo, data.orderId);
@@ -520,7 +536,7 @@ export default function POSPage() {
     setState({
       ...state,
       itemsTotal,
-      taxTotal, 
+      taxTotal,
       payableTotal
     });
     document.getElementById('modal-send-kitchen-summary').showModal();
@@ -541,16 +557,14 @@ export default function POSPage() {
         toast.success(res.data.message);
         document.getElementById("modal-send-kitchen-summary").close();
 
-        const {
-          page_format,
-          is_enable_print,
-        } = printSettings;
+        const page_format = printSettings?.page_format || null;
+        const is_enable_print = printSettings?.is_enable_print || 0;
 
         setDetailsForReceiptPrint({
           cartItems, deliveryType, customerType, customer, tableId, currency, storeSettings, printSettings,
           itemsTotal: state.itemsTotal,
           taxTotal: state.taxTotal,
-          payableTotal: state.payableTotal, 
+          payableTotal: state.payableTotal,
           tokenNo: data.tokenNo,
           orderId: data.orderId
         });
@@ -599,7 +613,7 @@ export default function POSPage() {
 
   return (
     <Page className='px-4 py-3 flex flex-col min-h-0'>
-      
+
       <div className="flex md:items-center justify-between flex-col md:flex-row gap-2">
         <h3>POS - Point of Sale</h3>
         <div className='flex flex-wrap items-center gap-4'>
@@ -618,7 +632,7 @@ export default function POSPage() {
       </div>
 
       <div className='mt-4 md:h-[calc(100vh-136px)] flex flex-col-reverse md:flex-row gap-4'>
-        
+
         {/* pos items */}
         <div className='border border-restro-border-green-light rounded-2xl h-full md:w-[70%] overflow-y-auto'>
 
@@ -725,7 +739,7 @@ export default function POSPage() {
             <div className="h-4"></div>
             {cartItems?.map((cartItem, i)=>{
               const {quantity, notes, title, price, variant, addons, ingredients} = cartItem;
-              
+
               const itemTotal = price * quantity;
               return <div key={i} className='text-sm border border-restro-border-green-light rounded-lg p-2 relative'>
                 <p>#{i+1} {title} x {quantity}</p>
@@ -806,7 +820,7 @@ export default function POSPage() {
       <dialog id="modal-notes" className="modal modal-bottom sm:modal-middle">
         <div className="modal-box">
           <h3 className="font-bold text-lg">Add Notes</h3>
-          
+
           <div className="my-4">
             <input type="hidden" ref={dialogNotesIndexRef} />
             <label htmlFor="dialogNotesText" className="mb-1 block text-gray-500 text-sm">Notes <span className="text-xs text-gray-500">(100 character max.)</span></label>
@@ -828,7 +842,7 @@ export default function POSPage() {
       <dialog id="modal-categories" className="modal modal-bottom sm:modal-middle">
         <div className="modal-box">
           <h3 className="font-bold text-lg">Filters</h3>
-          
+
           <div className="my-4">
             <label htmlFor="select_category" className="mb-1 block text-gray-500 text-sm">Select Category</label>
             <select ref={categoryFilterDropdownRef} type="text" name="select_category" id='select_category' className="text-sm w-full border rounded-lg px-4 py-2 bg-gray-50 outline-restro-border-green-light" placeholder="Select Category..." >
@@ -854,7 +868,7 @@ export default function POSPage() {
       <dialog id="modal-variants-addons" className="modal modal-bottom sm:modal-middle">
         <div className="modal-box">
           <h3 className="font-bold text-lg">Select Variant, Addons & Ingredients</h3>
-          
+
           <div className="my-4 flex gap-2">
             <div className="flex-1">
               <h3>Variants</h3>
@@ -918,7 +932,7 @@ export default function POSPage() {
       <dialog id="modal-save-draft" className="modal modal-bottom sm:modal-middle">
         <div className="modal-box">
           <h3 className="font-bold text-lg">Save Cart Items to Drafts</h3>
-          
+
           <div className="my-4">
             <label htmlFor="draftTitleRef" className="mb-1 block text-gray-500 text-sm">Reference</label>
             <input ref={draftTitleRef} type="text" name="draftTitleRef" id='draftTitleRef' className="text-sm w-full border rounded-lg px-4 py-2 bg-gray-50 outline-restro-border-green-light" placeholder="Enter Reference Name here..." />
@@ -946,7 +960,7 @@ export default function POSPage() {
               <button className="rounded-full hover:bg-gray-200 transition active:scale-95 bg-gray-100 text-gray-500 w-9 h-9 flex items-center justify-center"><IconX stroke={iconStroke} /></button>
             </form>
           </div>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-6 pb-6">
             {drafts.map((draftItem, index)=>{
               const {nameRef, date, cart} = draftItem;
@@ -969,7 +983,7 @@ export default function POSPage() {
             })}
           </div>
 
-          
+
         </div>
       </dialog>
       {/* dialog: drafts list */}
@@ -979,7 +993,7 @@ export default function POSPage() {
       <dialog id="modal-search-customer" className="modal modal-bottom sm:modal-middle">
         <div className="modal-box">
           <h3 className="font-bold text-lg">Search Customer</h3>
-          
+
           <div className="my-4 flex items-end gap-2">
             <div className='flex-1'>
               <label htmlFor="searchCustomerRef" className="mb-1 block text-gray-500 text-sm">Search Customer</label>
@@ -1005,7 +1019,7 @@ export default function POSPage() {
       <dialog id="modal-send-kitchen-summary" className="modal modal-bottom sm:modal-middle">
         <div className="modal-box">
           <h3 className="font-bold text-lg">Send order to Kitchen</h3>
-          
+
           <div className="my-4 flex items-center divide-x w-full">
             <div className="flex-1">
               <p>Items Net Total</p>
@@ -1036,7 +1050,7 @@ export default function POSPage() {
       <dialog id="modal-pay-and-send-kitchen-summary" className="modal modal-bottom sm:modal-middle">
         <div className="modal-box">
           <h3 className="font-bold text-lg">Collect Payment & Send order to Kitchen</h3>
-          
+
           <div className="my-4 flex items-center divide-x w-full">
             <div className="flex-1">
               <p>Items Net Total</p>
@@ -1067,7 +1081,7 @@ export default function POSPage() {
       <dialog id="modal-print-token" className="modal modal-bottom sm:modal-middle">
         <div className="modal-box">
           <h3 className="font-bold text-lg text-center">Order sent to Kitchen!</h3>
-          
+
           <div className="my-8 mx-auto w-fit">
             <div className="flex items-center gap-2">
               <div className="w-12 h-12 flex items-center justify-center bg-restro-green text-white rounded-full">

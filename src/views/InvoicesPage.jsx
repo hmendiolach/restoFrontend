@@ -17,6 +17,8 @@ import { getInvoiceOrders, getInvoicesInit, searchInvoices, useInvoices } from "
 import { getOrdersInit } from "../controllers/orders.controller";
 import { CURRENCIES } from "../config/currencies.config";
 import { setDetailsForReceiptPrint } from '../helpers/ReceiptHelper';
+import { getQRPaymentsLink } from "../config/config";
+import QRCode from "qrcode";
 
 export default function InvoicesPage() {
 
@@ -66,12 +68,12 @@ export default function InvoicesPage() {
         if(res.status == 200) {
           const ordersInit = res.data;
           const currency = CURRENCIES.find((c)=>c.cc==ordersInit?.storeSettings?.currency);
-  
+
           setState({
             ...state,
-            printSettings: ordersInit.printSettings,
-            storeSettings: ordersInit.storeSettings,
-            currency: currency.symbol,
+            printSettings: ordersInit.printSettings || {},
+            storeSettings: ordersInit.storeSettings || {},
+            currency: currency?.symbol,
           });
         }
       } catch (error) {
@@ -113,12 +115,12 @@ export default function InvoicesPage() {
           search: searchQuery,
           searchResults: res.data,
           spage: 1,
-        }); 
+        });
       } else {
         toast.dismiss();
         toast.error("No result found!");
       }
-      
+
     } catch (error) {
       console.error(error);
       const message = error.response.data.message || "Something went wrong! Try later!";
@@ -138,18 +140,29 @@ export default function InvoicesPage() {
     });
   };
 
-  const btnViewReceipt = async (orderIdsArr, tokens) => {
+  const generateReceiptQR = async (unique_code) => {
+    try {
+      const QR_PAYMENTS_LINK = getQRPaymentsLink(unique_code);
+      console.log(QR_PAYMENTS_LINK);
+      const qrDataURL = await QRCode.toDataURL(QR_PAYMENTS_LINK, { width: 1080 });
+      return qrDataURL;
+    } catch (error) {
+      console.error("QR Code generation failed:", error);
+      return null;
+    }
+  };
+
+
+  const btnViewReceipt = async (orderIdsArr, tokens, unique_code) => {
     try {
       toast.loading("Please wait...");
-      const res = await getInvoiceOrders(orderIdsArr); 
+      const res = await getInvoiceOrders(orderIdsArr);
       toast.dismiss();
 
       if(res.status == 200) {
-        console.log(res.data);
-        console.log(orderIdsArr);
         const {
-          subtotal, 
-          taxTotal, 
+          subtotal,
+          taxTotal,
           total,
           orders: ordersArr
         } = res.data;
@@ -176,13 +189,17 @@ export default function InvoicesPage() {
 
         const {customer_id, customer_type, customer_name, date, delivery_type} = ordersArr;
 
+        const qrCodeURL = await generateReceiptQR(unique_code);
+
+
         setDetailsForReceiptPrint({
           cartItems: orders, deliveryType:delivery_type, customerType:customer_type, customer:{id: customer_id, name: customer_name}, tableId: null, currency:state.currency, storeSettings: state.storeSettings, printSettings:state.printSettings,
           itemsTotal: subtotal,
           taxTotal: taxTotal,
-          payableTotal: total, 
+          payableTotal: total,
           tokenNo: tokens,
-          orderId: orderIds
+          orderId: orderIds,
+          qrCodeURL
         });
 
         const receiptWindow = window.open("/print-receipt", "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=400,height=400");
@@ -195,18 +212,17 @@ export default function InvoicesPage() {
     }
   };
 
-  const btnPrintReceipt = async (orderIdsArr, tokens) => {
+  const btnPrintReceipt = async (orderIdsArr, tokens, unique_code) => {
     try {
       toast.loading("Please wait...");
-      const res = await getInvoiceOrders(orderIdsArr); 
+      const res = await getInvoiceOrders(orderIdsArr);
       toast.dismiss();
 
       if(res.status == 200) {
-        console.log(res.data);
-        console.log(orderIdsArr);
+
         const {
-          subtotal, 
-          taxTotal, 
+          subtotal,
+          taxTotal,
           total,
           orders: ordersArr
         } = res.data;
@@ -233,13 +249,16 @@ export default function InvoicesPage() {
 
         const {customer_id, customer_type, customer_name, date, delivery_type} = ordersArr;
 
+        const qrCodeURL = await generateReceiptQR(unique_code);
+
         setDetailsForReceiptPrint({
           cartItems: orders, deliveryType:delivery_type, customerType:customer_type, customer:{id: customer_id, name: customer_name}, tableId: null, currency:state.currency, storeSettings: state.storeSettings, printSettings:state.printSettings,
           itemsTotal: subtotal,
           taxTotal: taxTotal,
-          payableTotal: total, 
+          payableTotal: total,
           tokenNo: tokens,
-          orderId: orderIds
+          orderId: orderIds,
+          qrCodeURL
         });
 
         const receiptWindow = window.open("/print-receipt", "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=400,height=400");
@@ -248,7 +267,7 @@ export default function InvoicesPage() {
             receiptWindow.print();
           },400)
         }
-        
+
       }
     } catch (error) {
       const message = error?.response?.data?.message || "Error processing your request, Please try later!";
@@ -315,12 +334,13 @@ export default function InvoicesPage() {
             </thead>
             <tbody>
               {state.searchResults.map((invoice, index)=>{
-                const { 
+                const {
                   invoice_id,
                   created_at,
                   sub_total,
                   tax_total,
                   total,
+                  unique_code,
                   table_id,
                   table_title,
                   floor,
@@ -348,12 +368,12 @@ export default function InvoicesPage() {
                   <td>{delivery_type?delivery_type:"N/A"}</td>
                   <td>{customer_id ?<b>{name}-({customer_id})</b>:"WALKIN"}</td>
                   <td>{table_id ? <b>{table_title}-{floor}</b>:"N/A"}</td>
-                  
+
                   <td className="flex items-center gap-2">
-                    <button onClick={()=>{btnViewReceipt(orderIdsArr, tokens)}} className="btn btn-sm btn-circle text-slate-500">
+                    <button onClick={()=>{btnViewReceipt(orderIdsArr, tokens , unique_code)}} className="btn btn-sm btn-circle text-slate-500">
                       <IconReceipt stroke={iconStroke} />
                     </button>
-                    <button onClick={()=>{btnPrintReceipt(orderIdsArr, tokens)}} className="btn btn-sm btn-circle text-slate-500">
+                    <button onClick={()=>{btnPrintReceipt(orderIdsArr, tokens , unique_code)}} className="btn btn-sm btn-circle text-slate-500">
                       <IconPrinter stroke={iconStroke} />
                     </button>
                   </td>
@@ -396,12 +416,13 @@ export default function InvoicesPage() {
             </thead>
             <tbody>
               {invoices.map((invoice, index)=>{
-                const { 
+                const {
                   invoice_id,
                   created_at,
                   sub_total,
                   tax_total,
                   total,
+                  unique_code,
                   table_id,
                   table_title,
                   floor,
@@ -429,12 +450,12 @@ export default function InvoicesPage() {
                   <td>{delivery_type?delivery_type:"N/A"}</td>
                   <td>{customer_id ?<b>{name}-({customer_id})</b>:"WALKIN"}</td>
                   <td>{table_id ? <b>{table_title}-{floor}</b>:"N/A"}</td>
-                  
+
                   <td className="flex items-center gap-2">
-                    <button onClick={()=>{btnViewReceipt(orderIdsArr, tokens)}} className="btn btn-sm btn-circle text-slate-500">
+                    <button onClick={()=>{btnViewReceipt(orderIdsArr, tokens, unique_code)}} className="btn btn-sm btn-circle text-slate-500">
                       <IconReceipt stroke={iconStroke} />
                     </button>
-                    <button onClick={()=>{btnPrintReceipt(orderIdsArr, tokens)}} className="btn btn-sm btn-circle text-slate-500">
+                    <button onClick={()=>{btnPrintReceipt(orderIdsArr, tokens, unique_code)}} className="btn btn-sm btn-circle text-slate-500">
                       <IconPrinter stroke={iconStroke} />
                     </button>
                   </td>

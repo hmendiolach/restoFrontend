@@ -88,10 +88,10 @@ export default function OrdersPage() {
         setState({
           ...state,
           kitchenOrders: orders,
-          printSettings: ordersInit.printSettings,
-          storeSettings: ordersInit.storeSettings,
-          paymentTypes: ordersInit.paymentTypes,
-          currency: currency.symbol,
+          printSettings: ordersInit.printSettings || {},
+          storeSettings: ordersInit.storeSettings || {},
+          paymentTypes: ordersInit.paymentTypes || {},
+          currency: currency?.symbol,
           isLoading: false,
         });
       }
@@ -267,7 +267,7 @@ export default function OrdersPage() {
 
       if (res.status == 200) {
         const { subtotal, taxTotal, total, orders } = res.data;
-        
+
 
         const tokenNoArray = orders.map(o=>o.token_no);
         const tokens = tokenNoArray.join(",");
