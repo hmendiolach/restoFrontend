@@ -31,6 +31,9 @@ import { initSocket } from "../utils/socket";
 import { textToSpeech } from "../utils/textToSpeech";
 import { getUserDetailsInLocalStorage } from "../helpers/UserDetails";
 
+import { getQRPaymentsLink } from '../config/config';
+import QRCode from "qrcode";
+
 export default function OrdersPage() {
   const printReceiptRef = useRef();
   const isQRPaymentRef = useRef();
@@ -295,6 +298,18 @@ export default function OrdersPage() {
       toast.error(message);
     }
   };
+
+  const generateReceiptQR = async (uniqueCode) => {
+    try {
+      const QR_PAYMENTS_LINK = getQRPaymentsLink(uniqueCode);
+      const qrDataURL = await QRCode.toDataURL(QR_PAYMENTS_LINK, { width: 1080 });
+      return qrDataURL;
+    } catch (error) {
+      console.error("QR Code generation failed:", error);
+      return null;
+    }
+  };
+
   const btnPayAndComplete = async () => {
     const isPrintReceipt = printReceiptRef.current.checked || false;
     const isQRPayment = isQRPaymentRef.current.checked || false;
@@ -349,6 +364,13 @@ export default function OrdersPage() {
             delivery_type,
           } = state.summaryOrders[0];
 
+          const unique_code = res.data?.uniqueCode || null;
+
+          console.log("unique" , unique_code);
+
+        const qrCodeURL = await generateReceiptQR(unique_code);
+
+
           setDetailsForReceiptPrint({
             cartItems: orders,
             deliveryType: delivery_type,
@@ -363,6 +385,7 @@ export default function OrdersPage() {
             payableTotal: state.summaryTotal,
             tokenNo: state.completeTokenIds,
             orderId: orderIds,
+            qrCodeURL
           });
 
           const receiptWindow = window.open(
