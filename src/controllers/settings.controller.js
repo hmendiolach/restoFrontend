@@ -14,11 +14,11 @@ export function useStoreSettings() {
   };
 }
 
-export async function saveStoreSettings(storeName, address, phone, email, currency, image, isQRMenuEnabled) {
+export async function saveStoreSettings(storeName, address, phone, email, currency, image, isQRMenuEnabled , isQRPaymentsEnabled) {
   try {
     const response = await ApiClient.post("/settings/store-setting", {
       storeName, address, phone, email, currency, image,
-      isQRMenuEnabled
+      isQRMenuEnabled,isQRPaymentsEnabled
     });
     return response;
   } catch (error) {
@@ -247,6 +247,28 @@ export async function removeDevice(deviceId) {
   try {
     const response = await ApiClient.post(`/auth/remove-device`, {
       device_id: deviceId
+    })
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export function usePaymentDetails() {
+  const APIURL = `/settings/payment-details`;
+  const { data, error, isLoading } = useSWR(APIURL, fetcher);
+  return {
+    data,
+    error,
+    isLoading,
+    APIURL,
+  };
+}
+
+export async function savePaymentDetails(stripeSecret ,  stripeWebhookSecret) {
+  try {
+    const response = await ApiClient.post(`/settings/save-payment-details`, {
+      stripeSecret , stripeWebhookSecret
     })
     return response;
   } catch (error) {

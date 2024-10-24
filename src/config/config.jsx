@@ -15,3 +15,7 @@ export const appVersion = "1.2.0";
 export const subscriptionAmount = 1;
 export const subscriptionPrice = "$" + subscriptionAmount;
 export const stripeProductSubscriptionId = "price_1PnMYMDt7zqLXTX5gyAlRHdh";
+
+export const getQRPaymentsLink = (code) => {
+    return `${FRONTEND_DOMAIN}/receipts/${code}`;
+}

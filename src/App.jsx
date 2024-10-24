@@ -49,6 +49,10 @@ import SuperAdminContactSupportPage from "./views/SuperAdmin/SuperAdminContactSu
 import SuperAdminTenantsPage from "./views/SuperAdmin/SuperAdminTenantsPage";
 import SuperAdminReportsPage from "./views/SuperAdmin/SuperAdminReportsPage";
 import SuperAdminTenantSubscriptionHistoryPage from "./views/SuperAdmin/SuperAdminTenantSubscriptionHistoryPage";
+import QRPaymentPage from "./views/QRPaymentPage";
+import PaymentDetailsPage from "./views/SettingsViews/PaymentDetailsPage";
+import OrderPaymentSuccessPage from "./views/OrderPaymentSuccessPage";
+import OrderPaymentCancelPage from "./views/OrderPaymentCancelPage";
 
 export default function App() {
   const [isNavbarCollapsed, setIsNavbarCollapsed] = useState(
@@ -71,6 +75,10 @@ export default function App() {
 
           <Route path="/success" element={<PaymentSuccessPage />} />
           <Route path="/cancelled-payment" element={<PaymentCancelledPage />} />
+
+          <Route path="/receipts/:code" element={<QRPaymentPage />} />
+          <Route path="/payment-success" element={<OrderPaymentSuccessPage />} />
+          <Route path="/payment-failed" element={<OrderPaymentCancelPage />} />
 
           <Route path="/dashboard/inactive-subscription" element={<InActiveSubscriptionPage />} />
 
@@ -205,6 +213,7 @@ export default function App() {
               />
               <Route path="tax-setup" element={<TaxSetupPage />} />
               <Route path="payment-types" element={<PaymentTypesPage />} />
+              <Route path="payment-details" element={<PaymentDetailsPage />} />
 
             </Route>
           </Route>

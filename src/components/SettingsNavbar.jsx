@@ -46,6 +46,11 @@ export default function SettingsNavbar() {
       text: "Payment Types",
       path: "/dashboard/settings/payment-types",
     },
+    {
+      icon: <IconCreditCard stroke={iconStroke} />,
+      text: "Payment Details",
+      path: "/dashboard/settings/payment-details",
+    },
     // {
     //   icon: <IconDevices stroke={iconStroke} />,
     //   text: "Devices",

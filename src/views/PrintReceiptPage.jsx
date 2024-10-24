@@ -5,31 +5,33 @@ export default function PrintReceiptPage() {
 
   const receiptDetails = getDetailsForReceiptPrint();
 
-  const { cartItems, deliveryType, customerType, customer, tableId, currency, storeSettings, printSettings, 
+  const { cartItems, deliveryType, customerType, customer, tableId, currency, storeSettings, printSettings,
     itemsTotal,
     taxTotal,
-    payableTotal, 
+    payableTotal,
     tokenNo,
-    orderId 
+    orderId,
+    qrCodeURL
   } = receiptDetails;
 
   const {
-    store_name,
-    address,
-    phone,
-    email,
-    image: storeImage,
-  } = storeSettings;
-  
+    store_name = '',
+    address = '',
+    phone = '',
+    email = '',
+    image: storeImage = '',
+    is_qr_payments_enabled = false
+  } = storeSettings || {};
+
   const {
-    page_format,
-    header,
-    footer,
-    show_notes,
-    show_store_details,
-    show_customer_details,
-    print_token,
-  } = printSettings;
+    page_format = '',
+    header = '',
+    footer = '',
+    show_notes = false,
+    show_store_details = false,
+    show_customer_details = false,
+    print_token = false
+  } = printSettings || {};
 
   return (
     <div className={`w-[${page_format}mm] font-sans px-2`}>
@@ -67,7 +69,7 @@ export default function PrintReceiptPage() {
 
         return <div key={index} className='w-full my-1'>
           <p>{title} {variant && <span>- {variant.title}</span>}</p>
-          {addons_ids?.length > 0 && <p className='text-xs'>Addons: 
+          {addons_ids?.length > 0 && <p className='text-xs'>Addons:
           {addons_ids.map((addonId, index)=>{
             const addon = addons.find((a)=>a.id==addonId);
             return addon.title;
@@ -108,6 +110,19 @@ export default function PrintReceiptPage() {
           {tokenNo}
         </div>
       </div>:<></>}
+
+      {(qrCodeURL && is_qr_payments_enabled) == true && (
+          <div className="flex flex-col items-center mt-4">
+            <img
+              src={qrCodeURL}
+              alt="Receipt QR Code"
+              className="mx-auto mt-2 max-w-[75%]"
+            />
+            <p className="text-lg font-semibold text-gray-700 mb-2">
+              Scan to Pay
+            </p>
+          </div>
+        )}
 
     </div>
   )

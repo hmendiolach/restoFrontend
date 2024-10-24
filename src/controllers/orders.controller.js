@@ -34,7 +34,7 @@ export async function updateKitchenOrderItemStatus(
 
 /**
  * @param {Array<Number>} orderIds - list of orders to cancel
- *  */  
+ *  */
 export async function cancelKitchenOrder(
     orderIds,
 ) {
@@ -50,7 +50,7 @@ export async function cancelKitchenOrder(
 
 /**
  * @param {Array<Number>} orderIds - list of orders to cancel
- *  */  
+ *  */
 export async function completeKitchenOrder(
     orderIds,
 ) {
@@ -77,20 +77,21 @@ export async function getCompleteOrderPaymentSummary(orderIds) {
 
 /**
  * @param {Array<Number>} orderIds - list of orders to cancel
- * @param {Number} subTotal 
- * @param {Number} taxTotal 
- * @param {Number} total 
- *  */  
+ * @param {Number} subTotal
+ * @param {Number} taxTotal
+ * @param {Number} total
+ *  */
 export async function payAndCompleteKitchenOrder(
     orderIds,
     subTotal,
     taxTotal,
-    total
+    total,
+    isQRPayment
 ) {
     try {
         const response = await ApiClient.post(`/orders/complete-and-pay-order`, {
             orderIds,
-            subTotal, taxTotal, total
+            subTotal, taxTotal, total, isQRPayment
         });
         return response;
     } catch (error) {

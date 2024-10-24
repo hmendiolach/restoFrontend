@@ -106,3 +106,29 @@ export async function cancelSubscription(subscriptionId) {
         throw error;
     }
 }
+
+export async function getStripePaymentURL({amount , currency , uniqueCode}) {
+    try {
+        const response = await ApiClient.post(`${API}/auth/accept-order-payment-via-stripe`, {
+            amount,
+            currency,
+            uniqueCode
+        });
+
+        return response;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export async function checkOrderPaymentStatus(sessionId, uniqueCode) {
+    try {
+        const response = await ApiClient.get(`${API}/auth/check-order-payment-status`, {
+            params:{sessionId, uniqueCode}
+        });
+
+        return response;
+    } catch (error) {
+        throw error;
+    }
+}
