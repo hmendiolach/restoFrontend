@@ -40,6 +40,8 @@ export default function POSPage() {
   const searchCustomerRef = useRef(null);
   // dialog: search customer
 
+  const isQRPaymentRef = useRef(0);
+
   const [state, setState] = useState({
     categories: [],
     menuItems: [],
@@ -473,9 +475,10 @@ export default function POSPage() {
       const tableId = tableRef.current.value;
       const customerType = state.customerType;
       const customer = state.customer;
+      const isQRPayment = isQRPaymentRef.current.checked;
 
       toast.loading("Please wait...");
-      const res = await createOrderAndInvoice(cartItems, deliveryType, customerType, customer, tableId, state.itemsTotal, state.taxTotal, state.payableTotal);
+      const res = await createOrderAndInvoice(cartItems, deliveryType, customerType, customer, tableId, state.itemsTotal, state.taxTotal, state.payableTotal, isQRPayment);
       toast.dismiss();
       if(res.status == 200) {
         const data = res.data;
@@ -505,6 +508,8 @@ export default function POSPage() {
           tokenNo: data.tokenNo,
           orderId: data.orderId,
         })
+
+        isQRPaymentRef.current.checked = false;
 
         if(is_enable_print) {
           const receiptWindow = window.open("/print-receipt", "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=400,height=400");
@@ -1065,6 +1070,19 @@ export default function POSPage() {
               <p className="text-lg font-bold text-restro-green">{currency}{state.payableTotal.toFixed(2)}</p>
             </div>
           </div>
+
+          <label
+              htmlFor="is_qr_payment"
+              className="mt-4 w-full flex justify-end items-center gap-2 pr-6"
+            >
+              <input
+                type="checkbox"
+                className="checkbox"
+                id="is_qr_payment"
+                ref={isQRPaymentRef}
+              />{" "}
+              QR Payment ?
+            </label>
 
           <div className="modal-action">
             <form method="dialog">

@@ -120,3 +120,15 @@ export async function getStripePaymentURL({amount , currency , uniqueCode}) {
         throw error;
     }
 }
+
+export async function checkOrderPaymentStatus(sessionId, uniqueCode) {
+    try {
+        const response = await ApiClient.get(`${API}/auth/check-order-payment-status`, {
+            params:{sessionId, uniqueCode}
+        });
+
+        return response;
+    } catch (error) {
+        throw error;
+    }
+}

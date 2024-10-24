@@ -33,6 +33,7 @@ import { getUserDetailsInLocalStorage } from "../helpers/UserDetails";
 
 export default function OrdersPage() {
   const printReceiptRef = useRef();
+  const isQRPaymentRef = useRef();
   const user = getUserDetailsInLocalStorage();
   const { socket, isSocketConnected } = useContext(SocketContext);
 
@@ -296,6 +297,7 @@ export default function OrdersPage() {
   };
   const btnPayAndComplete = async () => {
     const isPrintReceipt = printReceiptRef.current.checked || false;
+    const isQRPayment = isQRPaymentRef.current.checked || false;
 
     try {
       toast.loading("Please wait...");
@@ -303,7 +305,8 @@ export default function OrdersPage() {
         state.completeOrderIds,
         state.summaryNetTotal,
         state.summaryTaxTotal,
-        state.summaryTotal
+        state.summaryTotal,
+        isQRPayment
       );
       toast.dismiss();
       if (res.status == 200) {
@@ -374,6 +377,8 @@ export default function OrdersPage() {
           };
         }
       }
+
+      isQRPaymentRef.current.checked = false;
     } catch (error) {
       const message =
         error?.response?.data?.message ||
@@ -881,9 +886,10 @@ export default function OrdersPage() {
               </div>
             </div>
 
+            <div className="flex justify-end items-center gap-8 w-full mt-4">
             <label
               htmlFor="print_receipt"
-              className="mt-4 w-full flex justify-end items-center gap-2 "
+              className="flex items-center gap-2"
             >
               <input
                 type="checkbox"
@@ -893,6 +899,22 @@ export default function OrdersPage() {
               />{" "}
               Print Receipt?
             </label>
+
+            <label
+              htmlFor="is_qr_payment"
+              className="flex items-center gap-2"
+            >
+              <input
+                type="checkbox"
+                className="checkbox"
+                id="is_qr_payment"
+                ref={isQRPaymentRef}
+              />{" "}
+              QR Payment ?
+            </label>
+            </div>
+
+
           </div>
           <div className="modal-action">
             <form method="dialog">

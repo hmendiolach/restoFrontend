@@ -329,6 +329,7 @@ export default function InvoicesPage() {
                 <th>Delivery Type</th>
                 <th>Customer</th>
                 <th>Table</th>
+                <th>Payment Status</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -344,6 +345,7 @@ export default function InvoicesPage() {
                   table_id,
                   table_title,
                   floor,
+                  payment_status,
                   delivery_type,
                   customer_type,
                   customer_id,
@@ -368,6 +370,7 @@ export default function InvoicesPage() {
                   <td>{delivery_type?delivery_type:"N/A"}</td>
                   <td>{customer_id ?<b>{name}-({customer_id})</b>:"WALKIN"}</td>
                   <td>{table_id ? <b>{table_title}-{floor}</b>:"N/A"}</td>
+                  <td>{payment_status ? <b>{payment_status.charAt(0).toUpperCase() + payment_status.slice(1)}</b> : "N/A"}</td>
 
                   <td className="flex items-center gap-2">
                     <button onClick={()=>{btnViewReceipt(orderIdsArr, tokens , unique_code)}} className="btn btn-sm btn-circle text-slate-500">
@@ -411,6 +414,7 @@ export default function InvoicesPage() {
                 <th>Delivery Type</th>
                 <th>Customer</th>
                 <th>Table</th>
+                <th>Payment Status</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -426,6 +430,7 @@ export default function InvoicesPage() {
                   table_id,
                   table_title,
                   floor,
+                  payment_status,
                   delivery_type,
                   customer_type,
                   customer_id,
@@ -450,7 +455,7 @@ export default function InvoicesPage() {
                   <td>{delivery_type?delivery_type:"N/A"}</td>
                   <td>{customer_id ?<b>{name}-({customer_id})</b>:"WALKIN"}</td>
                   <td>{table_id ? <b>{table_title}-{floor}</b>:"N/A"}</td>
-
+                  <td>{payment_status ? <b>{payment_status.charAt(0).toUpperCase() + payment_status.slice(1)}</b> : "N/A"}</td>
                   <td className="flex items-center gap-2">
                     <button onClick={()=>{btnViewReceipt(orderIdsArr, tokens, unique_code)}} className="btn btn-sm btn-circle text-slate-500">
                       <IconReceipt stroke={iconStroke} />

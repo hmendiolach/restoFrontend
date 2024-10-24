@@ -22,11 +22,11 @@ export async function createOrder(cart, deliveryType, customerType, customerId, 
   }
 }
 
-export async function createOrderAndInvoice(cart, deliveryType, customerType, customerId, tableId, netTotal, taxTotal, total) {
+export async function createOrderAndInvoice(cart, deliveryType, customerType, customerId, tableId, netTotal, taxTotal, total, isQRPayment) {
   try {
     const response = await ApiClient.post("/pos/create-order-and-invoice", {
       cart, deliveryType, customerType, customerId, tableId,
-      netTotal, taxTotal, total
+      netTotal, taxTotal, total, isQRPayment
     });
     return response;
   } catch (error) {
@@ -37,7 +37,7 @@ export async function createOrderAndInvoice(cart, deliveryType, customerType, cu
 // drafts
 /**
  * @returns {Array}
- *  */ 
+ *  */
 export function getDrafts() {
   const draftsString = localStorage.getItem(DRAFTS_KEY);
   const drafts = draftsString ? JSON.parse(draftsString) : [];
@@ -45,8 +45,8 @@ export function getDrafts() {
 }
 
 /**
- * @param {Array} drafts 
- *  */ 
+ * @param {Array} drafts
+ *  */
 export function setDrafts(drafts) {
   localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts));
 }
